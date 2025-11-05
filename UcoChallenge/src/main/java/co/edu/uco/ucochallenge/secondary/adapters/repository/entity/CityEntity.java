@@ -21,7 +21,7 @@ public class CityEntity {
 	private UUID id;
 
 	@ManyToOne
-	@JoinColumn(name = "departamento_id", nullable = false)
+	@JoinColumn(name = "departamento", nullable = false)
 	private StateEntity state;
 
 	@Column(name = "nombre")
