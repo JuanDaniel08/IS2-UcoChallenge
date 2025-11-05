@@ -2,6 +2,7 @@ package co.edu.uco.ucochallenge.user.registeruser.application.service;
 
 import co.edu.uco.ucochallenge.secondary.adapters.repository.entity.VerificationTokenEntity;
 import co.edu.uco.ucochallenge.secondary.ports.repository.VerificationTokenRepository;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.CatalogUseCase;
 import org.springframework.stereotype.Service;
 import java.time.*;
 import java.util.*;
@@ -10,9 +11,12 @@ import java.util.*;
 public class VerificationTokenService {
 
     private final VerificationTokenRepository repository;
+    private final CatalogUseCase catalogUseCase;
 
-    public VerificationTokenService(VerificationTokenRepository repository) {
+    public VerificationTokenService(VerificationTokenRepository repository,
+                                   CatalogUseCase catalogUseCase) {
         this.repository = repository;
+        this.catalogUseCase = catalogUseCase;
     }
 
     public String generateEmailToken(UUID userId, Duration validity) {
@@ -44,11 +48,17 @@ public class VerificationTokenService {
 
     private void consume(String token, String expectedType) {
         var entity = repository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Token inválido"));
+                .orElseThrow(() -> new IllegalArgumentException(catalogUseCase.getMessage("token.invalid")));
 
-        if (!entity.getType().equals(expectedType)) throw new IllegalArgumentException("Tipo de token incorrecto");
-        if (Instant.now().isAfter(entity.getExpiresAt())) throw new IllegalArgumentException("Token expirado");
-        if (entity.isUsed()) throw new IllegalArgumentException("Token ya utilizado");
+        if (!entity.getType().equals(expectedType)) {
+            throw new IllegalArgumentException(catalogUseCase.getMessage("token.type.incorrect"));
+        }
+        if (Instant.now().isAfter(entity.getExpiresAt())) {
+            throw new IllegalArgumentException(catalogUseCase.getMessage("token.expired"));
+        }
+        if (entity.isUsed()) {
+            throw new IllegalArgumentException(catalogUseCase.getMessage("token.already.used"));
+        }
 
         entity.setUsed(true);
         repository.save(entity);

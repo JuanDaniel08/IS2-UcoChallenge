@@ -2,6 +2,7 @@ package co.edu.uco.ucochallenge.user.registeruser.application.service;
 
 import co.edu.uco.ucochallenge.secondary.ports.repository.UserRepository;
 import co.edu.uco.ucochallenge.secondary.adapters.repository.entity.UserEntity;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.CatalogUseCase;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,13 +15,16 @@ public class UserRegistrationService {
     private final UserRepository repo;
     private final VerificationTokenService tokenService;
     private final NotificationService notification;
+    private final CatalogUseCase catalogUseCase;
 
     public UserRegistrationService(UserRepository repo,
                                    VerificationTokenService tokenService,
-                                   NotificationService notification) {
+                                   NotificationService notification,
+                                   CatalogUseCase catalogUseCase) {
         this.repo = repo;
         this.tokenService = tokenService;
         this.notification = notification;
+        this.catalogUseCase = catalogUseCase;
     }
 
     @Transactional
@@ -30,24 +34,24 @@ public class UserRegistrationService {
         }
 
         repo.findByEmail(incoming.getEmail()).ifPresent(existing -> {
-            notification.notifyActor(ejecutor, "Ya existe un usuario con el email: " + incoming.getEmail());
-            notification.notifyOwnerEmail(existing.getEmail(), "Se intentó registrar otro usuario con tu email.");
-            throw new BusinessRuleException("Email ya registrado");
+            notification.notifyActor(ejecutor, catalogUseCase.getMessage("notification.email.duplicate.actor", incoming.getEmail()));
+            notification.notifyOwnerEmail(existing.getEmail(), catalogUseCase.getMessage("notification.email.duplicate.owner"));
+            throw new BusinessRuleException(catalogUseCase.getMessage("business.email.registered"));
         });
 
         if (incoming.getMobileNumber() != null) {
             repo.findByMobileNumber(incoming.getMobileNumber()).ifPresent(existing -> {
-                notification.notifyActor(ejecutor, "Ya existe un usuario con el número: " + incoming.getMobileNumber());
-                notification.notifyOwnerSms(existing.getMobileNumber(), "Se intentó registrar otro usuario con tu número.");
-                throw new BusinessRuleException("Número móvil ya registrado");
+                notification.notifyActor(ejecutor, catalogUseCase.getMessage("notification.mobile.duplicate.actor", incoming.getMobileNumber()));
+                notification.notifyOwnerSms(existing.getMobileNumber(), catalogUseCase.getMessage("notification.mobile.duplicate.owner"));
+                throw new BusinessRuleException(catalogUseCase.getMessage("business.mobile.registered"));
             });
         }
 
         repo.findByIdTypeAndIdNumber(incoming.getIdType(), incoming.getIdNumber()).ifPresent(existing -> {
-            notification.notifyActor(ejecutor, "Ya existe un usuario con el mismo tipo y número de identificación.");
-            notification.notifyAdmin("Doble identificación detectada: tipo=" + incoming.getIdType() +
-                    ", número=" + incoming.getIdNumber());
-            throw new BusinessRuleException("Identificación ya registrada");
+            notification.notifyActor(ejecutor, catalogUseCase.getMessage("notification.identification.duplicate.actor"));
+            notification.notifyAdmin(catalogUseCase.getMessage("notification.identification.duplicate.admin", 
+                    incoming.getIdType().toString(), incoming.getIdNumber()));
+            throw new BusinessRuleException(catalogUseCase.getMessage("business.identification.registered"));
         });
 
         UserEntity saved = repo.save(incoming);
@@ -60,10 +64,10 @@ public class UserRegistrationService {
             notification.sendSmsVerification(saved.getMobileNumber(), smsToken);
         }
 
-        notification.notifyActor(ejecutor, "Usuario registrado. Se enviaron confirmaciones.");
+        notification.notifyActor(ejecutor, catalogUseCase.getMessage("notification.user.registered.success"));
         return saved.getId();
     }
-
+    // Confirmacion de Tokens de email y sms
     @Transactional
     public void confirmEmail(String token) {
         tokenService.consumeEmailToken(token);

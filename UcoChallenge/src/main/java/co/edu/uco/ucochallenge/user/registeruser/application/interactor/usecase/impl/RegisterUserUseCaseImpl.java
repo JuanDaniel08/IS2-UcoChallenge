@@ -8,6 +8,7 @@ import co.edu.uco.ucochallenge.secondary.adapters.repository.entity.IdTypeEntity
 import co.edu.uco.ucochallenge.secondary.adapters.repository.entity.UserEntity;
 import co.edu.uco.ucochallenge.secondary.ports.repository.CityRepository;
 import co.edu.uco.ucochallenge.secondary.ports.repository.UserRepository;
+import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.CatalogUseCase;
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.RegisterUserUseCase;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
 import co.edu.uco.ucochallenge.user.registeruser.application.service.NotificationService;
@@ -20,17 +21,18 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
 	
 	private UserRepository repository;
 	private CityRepository cityRepository;
-	private UsuarioConMismoId usuarioConMismoId;
+	private CatalogUseCase catalogUseCase;
 	private NotificationService notificationService;
 	private VerificationTokenService tokenService;
 	
 	public RegisterUserUseCaseImpl(UserRepository repository, 
 			CityRepository cityRepository,
+			CatalogUseCase catalogUseCase,
 			NotificationService notificationService,
 			VerificationTokenService tokenService) {
 		this.repository = repository;
 		this.cityRepository = cityRepository;
-		this.usuarioConMismoId = new UsuarioConMismoId(repository);
+		this.catalogUseCase = catalogUseCase;
 		this.notificationService = notificationService;
 		this.tokenService = tokenService;
 	}
@@ -47,39 +49,40 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
 		var idTypeEntity = new IdTypeEntity.Builder().id(domain.getIdType()).build();
 
 		try {
-			// 1. Un user con el mismo ID (seguir la lógica de UsuarioConMismoId)
-			resultadoFinal.agregarMensajes(usuarioConMismoId.validate(nuevoUsuarioId).getMensajes());
+			// NOTA: La validación de ID duplicado se omite para registros nuevos porque
+			// siempre se genera un UUID único. Esta validación es útil para actualizaciones.
+			// Si en el futuro se necesita validar IDs específicos, usar: usuarioConMismoId.validate(nuevoUsuarioId)
 
 			// 3. No puede existir un usuario con el mismo idType y IdNumber
 			repository.findByIdTypeAndIdNumber(idTypeEntity, domain.getIdNumber())
 					.ifPresent(existing -> {
-						resultadoFinal.agregarMensaje("Ya existe un usuario con el mismo tipo y número de identificación");
+						resultadoFinal.agregarMensaje(catalogUseCase.getMessage("validation.user.idtype.idnumber.duplicate"));
 						// Regla 5: Notificar al admin sobre la novedad
-						notificationService.notifyAdmin("Doble identificación detectada: tipo=" + domain.getIdType() + 
-								", número=" + domain.getIdNumber());
+						notificationService.notifyAdmin(catalogUseCase.getMessage("notification.identification.duplicate.admin", 
+								domain.getIdType().toString(), domain.getIdNumber()));
 					});
 
 			// 4. No puede existir un usuario con el mismo email
 			repository.findByEmail(domain.getEmail())
 					.ifPresent(existing -> {
-						resultadoFinal.agregarMensaje("Ya existe un usuario con el mismo email");
+						resultadoFinal.agregarMensaje(catalogUseCase.getMessage("validation.user.email.duplicate"));
 						// Regla 4: Notificar al dueño del email existente
 						notificationService.notifyOwnerEmail(existing.getEmail(), 
-								"Se intentó registrar otro usuario con tu email.");
+								catalogUseCase.getMessage("notification.email.duplicate.owner"));
 					});
 
 			// 6. No puede existir 2 usuarios con el mismo mobile number
 			repository.findByMobileNumber(domain.getMobileNumber())
 					.ifPresent(existing -> {
-						resultadoFinal.agregarMensaje("Ya existe un usuario con el mismo número móvil");
+						resultadoFinal.agregarMensaje(catalogUseCase.getMessage("validation.user.mobile.duplicate"));
 						// Regla 7: Informar al dueño del número ya existente por SMS
 						if (existing.getMobileNumber() != null) {
 							notificationService.notifyOwnerSms(existing.getMobileNumber(), 
-									"Se intentó registrar otro usuario con tu número móvil.");
+									catalogUseCase.getMessage("notification.mobile.duplicate.owner.sms"));
 						}
 					});
 		} catch (Exception e) {
-			resultadoFinal.agregarMensaje("Error inesperado durante la validación: " + e.getMessage());
+			resultadoFinal.agregarMensaje(catalogUseCase.getMessage("validation.error.unexpected", e.getMessage()));
 		}
 
 		// Si hay errores de validación no persistimos
@@ -90,7 +93,7 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
 		// Mapear Domain -> Entity y persistir
 		// Cargar CityEntity completo desde la BD para tener las relaciones con State y Country
 		CityEntity homeCity = cityRepository.findById(domain.getHomeCity())
-				.orElseThrow(() -> new IllegalArgumentException("La ciudad especificada no existe"));
+				.orElseThrow(() -> new IllegalArgumentException(catalogUseCase.getMessage("validation.city.not.exists")));
 		
 		var userEntity = new UserEntity.Builder()
 				.id(nuevoUsuarioId)
