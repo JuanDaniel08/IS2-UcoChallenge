@@ -3,10 +3,10 @@ package co.edu.uco.ucochallenge.primary.controller;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import co.edu.uco.ucochallenge.secondary.ports.repository.*;
-
 
 @RestController
 @RequestMapping("/uco-challenge/api/v1/catalog")
@@ -28,12 +28,9 @@ public class CatalogController {
         this.idTypeRepo = idTypeRepo;
     }
 
-    // -------------------------
-    // 📍 Listar países
-    // -------------------------
     @GetMapping("/countries")
-    public List<Map<String, Object>> getCountries() {
-        return countryRepo.findAll().stream()
+    public ResponseEntity<List<Map<String, Object>>> getCountries() {
+        List<Map<String, Object>> countries = countryRepo.findAll().stream()
                 .map(country -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("id", country.getId());
@@ -41,25 +38,49 @@ public class CatalogController {
                     return map;
                 })
                 .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(countries);
     }
 
-
     @GetMapping("/states")
-    public List<Map<String, Object>> getStates(@RequestParam UUID countryId) {
-        return stateRepo.findByCountryId(countryId).stream()
+    public ResponseEntity<?> getStates(@RequestParam(required = true) UUID countryId) {
+        if (countryId == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "El parámetro countryId es requerido"));
+        }
+        
+        // Validar que el país existe
+        if (!countryRepo.existsById(countryId)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "El país especificado no existe"));
+        }
+        
+        List<Map<String, Object>> states = stateRepo.findByCountryId(countryId).stream()
                 .map(state -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("id", state.getId());
-                    map.put("name", state.getName()); 
+                    map.put("name", state.getName());
                     return map;
                 })
                 .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(states);
     }
 
-
     @GetMapping("/cities")
-    public List<Map<String, Object>> getCities(@RequestParam UUID stateId) {
-        return cityRepo.findByState_Id(stateId).stream()
+    public ResponseEntity<?> getCities(@RequestParam(required = true) UUID stateId) {
+        if (stateId == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "El parámetro stateId es requerido"));
+        }
+        
+        // Validar que el departamento existe
+        if (!stateRepo.existsById(stateId)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "El departamento especificado no existe"));
+        }
+        
+        List<Map<String, Object>> cities = cityRepo.findByState_Id(stateId).stream()
                 .map(city -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("id", city.getId());
@@ -67,12 +88,13 @@ public class CatalogController {
                     return map;
                 })
                 .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(cities);
     }
 
- 
     @GetMapping("/id-types")
-    public List<Map<String, Object>> getIdTypes() {
-        return idTypeRepo.findAll().stream()
+    public ResponseEntity<List<Map<String, Object>>> getIdTypes() {
+        List<Map<String, Object>> idTypes = idTypeRepo.findAll().stream()
                 .map(idType -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("id", idType.getId());
@@ -80,6 +102,8 @@ public class CatalogController {
                     return map;
                 })
                 .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(idTypes);
     }
 }
 

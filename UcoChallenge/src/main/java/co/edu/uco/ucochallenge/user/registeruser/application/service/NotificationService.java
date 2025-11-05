@@ -1,31 +1,67 @@
 package co.edu.uco.ucochallenge.user.registeruser.application.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import co.edu.uco.ucochallenge.user.registeruser.application.service.dto.NotificationMessage;
 
 @Service
 public class NotificationService {
 
-    public void sendEmailVerification(String email, String token) {
-        System.out.println("[EMAIL] Enviando verificación a " + email + " con token: " + token);
-    }
+	private final StringRedisTemplate redisTemplate;
+	private final ObjectMapper objectMapper;
+	
+	private static final String CHANNEL_EMAIL_VERIFICATION = "notification:email:verification";
+	private static final String CHANNEL_SMS_VERIFICATION = "notification:sms:verification";
+	private static final String CHANNEL_ACTOR = "notification:actor";
+	private static final String CHANNEL_OWNER_EMAIL = "notification:owner:email";
+	private static final String CHANNEL_OWNER_SMS = "notification:owner:sms";
+	private static final String CHANNEL_ADMIN = "notification:admin";
 
-    public void sendSmsVerification(String phone, String token) {
-        System.out.println("[SMS] Enviando verificación a " + phone + " con token: " + token);
-    }
+	public NotificationService(StringRedisTemplate redisTemplate) {
+		this.redisTemplate = redisTemplate;
+		this.objectMapper = new ObjectMapper();
+	}
 
-    public void notifyActor(String actor, String message) {
-        System.out.println("[NOTIFY actor=" + actor + "] " + message);
-    }
+	public void sendEmailVerification(String email, String token) {
+		String message = String.format("Enviando verificación a %s con token: %s", email, token);
+		publishMessage(CHANNEL_EMAIL_VERIFICATION, email, message);
+	}
 
-    public void notifyOwnerEmail(String email, String message) {
-        System.out.println("[NOTIFY OWNER EMAIL] " + email + ": " + message);
-    }
+	public void sendSmsVerification(String phone, String token) {
+		String message = String.format("Enviando verificación a %s con token: %s", phone, token);
+		publishMessage(CHANNEL_SMS_VERIFICATION, phone, message);
+	}
 
-    public void notifyOwnerSms(String phone, String message) {
-        System.out.println("[NOTIFY OWNER SMS] " + phone + ": " + message);
-    }
+	public void notifyActor(String actor, String message) {
+		publishMessage(CHANNEL_ACTOR, actor, message);
+	}
 
-    public void notifyAdmin(String message) {
-        System.out.println("[ADMIN ALERT] " + message);
-    }
+	public void notifyOwnerEmail(String email, String message) {
+		publishMessage(CHANNEL_OWNER_EMAIL, email, message);
+	}
+
+	public void notifyOwnerSms(String phone, String message) {
+		publishMessage(CHANNEL_OWNER_SMS, phone, message);
+	}
+
+	public void notifyAdmin(String message) {
+		publishMessage(CHANNEL_ADMIN, "admin", message);
+	}
+	
+	private void publishMessage(String channel, String recipient, String message) {
+		try {
+			NotificationMessage notificationMessage = new NotificationMessage(channel, recipient, message);
+			String jsonMessage = objectMapper.writeValueAsString(notificationMessage);
+			redisTemplate.convertAndSend(channel, jsonMessage);
+			// Log opcional para debugging
+			System.out.println(String.format("[REDIS PUBLISH] Canal: %s, Destinatario: %s", channel, recipient));
+		} catch (JsonProcessingException e) {
+			// Fallback a System.out en caso de error de serialización
+			System.err.println("Error al serializar mensaje para Redis: " + e.getMessage());
+			System.out.println(String.format("[%s] %s: %s", channel, recipient, message));
+		}
+	}
 }
