@@ -3,6 +3,7 @@ package co.edu.uco.ucochallenge.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -12,11 +13,18 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import co.edu.uco.ucochallenge.user.registeruser.application.service.listener.NotificationListener;
 
-
 @Configuration
 public class RedisConfig {
-	
-	@Bean
+
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+ 
+        return new LettuceConnectionFactory("localhost", 6379);
+    }
+
+
+    @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
@@ -24,41 +32,35 @@ public class RedisConfig {
         template.setValueSerializer(new StringRedisSerializer());
         return template;
     }
-	
-	@Bean
-	public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
-		return new StringRedisTemplate(connectionFactory);
-	}
-	
-	@Bean
-	public RedisMessageListenerContainer redisMessageListenerContainer(
-			RedisConnectionFactory connectionFactory,
-			NotificationListener notificationListener) {
-		
-		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-		container.setConnectionFactory(connectionFactory);
-		
-		// Suscribirse a todos los canales de notificación
-		container.addMessageListener(
-				new MessageListenerAdapter(notificationListener),
-				new ChannelTopic("notification:email:verification"));
-		container.addMessageListener(
-				new MessageListenerAdapter(notificationListener),
-				new ChannelTopic("notification:sms:verification"));
-		container.addMessageListener(
-				new MessageListenerAdapter(notificationListener),
-				new ChannelTopic("notification:actor"));
-		container.addMessageListener(
-				new MessageListenerAdapter(notificationListener),
-				new ChannelTopic("notification:owner:email"));
-		container.addMessageListener(
-				new MessageListenerAdapter(notificationListener),
-				new ChannelTopic("notification:owner:sms"));
-		container.addMessageListener(
-				new MessageListenerAdapter(notificationListener),
-				new ChannelTopic("notification:admin"));
-		
-		return container;
-	}
-	
+
+  
+    @Bean
+    public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
+        return new StringRedisTemplate(connectionFactory);
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(
+            RedisConnectionFactory connectionFactory,
+            NotificationListener notificationListener) {
+
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+
+        container.addMessageListener(new MessageListenerAdapter(notificationListener),
+                new ChannelTopic("notification:email:verification"));
+        container.addMessageListener(new MessageListenerAdapter(notificationListener),
+                new ChannelTopic("notification:sms:verification"));
+        container.addMessageListener(new MessageListenerAdapter(notificationListener),
+                new ChannelTopic("notification:actor"));
+        container.addMessageListener(new MessageListenerAdapter(notificationListener),
+                new ChannelTopic("notification:owner:email"));
+        container.addMessageListener(new MessageListenerAdapter(notificationListener),
+                new ChannelTopic("notification:owner:sms"));
+        container.addMessageListener(new MessageListenerAdapter(notificationListener),
+                new ChannelTopic("notification:admin"));
+
+        return container;
+    }
 }
+
