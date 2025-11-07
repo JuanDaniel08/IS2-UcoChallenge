@@ -28,7 +28,7 @@ public class StateEntity {
 	private String name;
 
 	protected StateEntity() {
-		setId(UUIDHelper.getDefault());
+		setId(UUIDHelper.getDefault(null));
 		setCountry(new CountryEntity());
 		setName(TextHelper.getDefault());
 	}

@@ -5,16 +5,11 @@ import co.edu.uco.ucochallenge.user.listuser.application.interactor.dto.UserFilt
 import co.edu.uco.ucochallenge.user.listuser.application.interactor.dto.UserOutputDTO;
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.RegisterUserInteractor;
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.dto.RegisterUserInputDTO;
-<<<<<<< HEAD
 import co.edu.uco.ucochallenge.user.registeruser.service.UserRegistrationService;
 import co.edu.uco.ucochallenge.user.deleteuser.application.interactor.DeleteUserInteractor;
 import co.edu.uco.ucochallenge.user.deleteuser.application.interactor.dto.DeleteUserInputDTO;
-
-=======
-import co.edu.uco.ucochallenge.user.registeruser.application.service.UserRegistrationService;
 import co.edu.uco.ucochallenge.user.updateuser.application.interactor.UpdateUserInteractor;
 import co.edu.uco.ucochallenge.user.updateuser.application.interactor.dto.UpdateUserInputDTO;
->>>>>>> 00cf598b4a594ff16f22ad99837958de6b21820e
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -30,27 +25,20 @@ public class UserController {
 
     private final RegisterUserInteractor registerUserInteractor;
     private final UserRegistrationService registrationService;
-<<<<<<< HEAD
     private final DeleteUserInteractor deleteUserInteractor;
-
-    public UserController(RegisterUserInteractor registerUserInteractor,
-                          UserRegistrationService registrationService,
-                          DeleteUserInteractor deleteUserInteractor) {
-=======
     private final ListUsersInteractor listUsersInteractor;
     private final UpdateUserInteractor updateUserInteractor;
 
     public UserController(RegisterUserInteractor registerUserInteractor,
                           UserRegistrationService registrationService,
-                          UpdateUserInteractor updateUserInteractor,
-                          ListUsersInteractor listUsersInteractor) {
->>>>>>> 00cf598b4a594ff16f22ad99837958de6b21820e
+                          DeleteUserInteractor deleteUserInteractor,
+                          ListUsersInteractor listUsersInteractor,
+                          UpdateUserInteractor updateUserInteractor) {
         this.registerUserInteractor = registerUserInteractor;
-        this.listUsersInteractor = listUsersInteractor;
-        this.updateUserInteractor = updateUserInteractor;
-
         this.registrationService = registrationService;
         this.deleteUserInteractor = deleteUserInteractor;
+        this.listUsersInteractor = listUsersInteractor;
+        this.updateUserInteractor = updateUserInteractor;
     }
 
     // === REGISTRO DE USUARIO ===
@@ -78,6 +66,7 @@ public class UserController {
         registerUserInteractor.execute(normalizedDto);
         return new ResponseEntity<>(Map.of("message", "Usuario registrado exitosamente"), HttpStatus.CREATED);
     }
+
     @GetMapping("/filter/{page}/{size}")
     public ResponseEntity<?> getUsers(
             @PathVariable int page,
@@ -87,9 +76,9 @@ public class UserController {
         UserFilterInputDTO dto = UserFilterInputDTO.of(page, size, name);
         Page<UserOutputDTO> users = listUsersInteractor.execute(dto);
 
-
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
+
     @PutMapping("/{userId}")
     public ResponseEntity<?> updateUser(
             @PathVariable UUID userId,
@@ -140,12 +129,6 @@ public class UserController {
         }
     }
 
-<<<<<<< HEAD
-    // === CONFIRMAR SMS ===
-=======
-
-
->>>>>>> 00cf598b4a594ff16f22ad99837958de6b21820e
     @PostMapping("/confirm/sms/{token}")
     public ResponseEntity<?> confirmSms(@PathVariable String token) {
         if (token == null || token.isBlank()) {

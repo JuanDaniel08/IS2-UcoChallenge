@@ -9,9 +9,9 @@ import co.edu.uco.ucochallenge.secondary.adapters.repository.entity.UserEntity;
 import co.edu.uco.ucochallenge.secondary.ports.repository.CityRepository;
 import co.edu.uco.ucochallenge.secondary.ports.repository.UserRepository;
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.RegisterUserUseCase;
-import co.edu.uco.ucochallenge.user.registeruser.application.service.NotificationService;
-import co.edu.uco.ucochallenge.user.registeruser.application.service.VerificationTokenService;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
+import co.edu.uco.ucochallenge.user.registeruser.service.NotificationService;
+import co.edu.uco.ucochallenge.user.registeruser.service.VerificationTokenService;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
