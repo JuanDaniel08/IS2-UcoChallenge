@@ -5,14 +5,14 @@ import java.util.UUID;
 import co.edu.uco.ucochallenge.crosscuting.helper.TextHelper;
 import co.edu.uco.ucochallenge.crosscuting.helper.UUIDHelper;
 
-public record RegisterUserInputDTO(UUID idType, String idNumber, String firstName, String secondName, String firstSurname,
+public record RegisterUserInputDTO(String idType, UUID idNumber, String firstName, String secondName, String firstSurname,
 		String secondSurname, UUID homeCity, String email, String mobileNumber) {
 	
-	public static RegisterUserInputDTO normalize(final UUID idType, final String idNumber,final String firstName,final String secondName,final String firstSurname,
+	public static RegisterUserInputDTO normalize(final String idType, final UUID idNumber,final String firstName,final String secondName,final String firstSurname,
 			final String secondSurname,final UUID homeCity,final String email,final String mobileNumber) {
-		 var idTypeNormalized = UUIDHelper.getDefault(idType);
-		 var idNumberNormalized = TextHelper.getDefaultWithTrim(idNumber);
-		 var firstNameNormalized = TextHelper.getDefaultWithTrim(firstName);
+		 var  idTypeNormalized = TextHelper.getDefaultWithTrim(idType);
+		var idNumberNormalized = UUIDHelper.getDefault(idNumber);
+		var firstNameNormalized = TextHelper.getDefaultWithTrim(firstName);
 		 var secondNameNormalized = TextHelper.getDefaultWithTrim(secondName);
 		 var firstSurnameNormalized = TextHelper.getDefaultWithTrim(firstSurname);
 		 var secondSurnameNormalized = TextHelper.getDefaultWithTrim(secondSurname);
