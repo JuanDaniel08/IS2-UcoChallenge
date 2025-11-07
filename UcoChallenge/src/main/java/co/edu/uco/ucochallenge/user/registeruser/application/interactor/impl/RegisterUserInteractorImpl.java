@@ -23,16 +23,17 @@ public class RegisterUserInteractorImpl implements RegisterUserInteractor {
     public Void execute(final RegisterUserInputDTO dto) {
 
 
+
         RegisterUserDomain registerUserDomain = new RegisterUserDomain(
-            dto.idType(),
-            dto.idNumber(),
-            dto.firstName(),
-            dto.secondName(),
-            dto.firstSurname(),
-            dto.secondSurname(),
-            dto.homeCity(),
-            dto.email(),
-            dto.mobileNumber()
+                dto.idNumber(),
+                dto.idType(),
+                dto.firstName(),
+                dto.secondName(),
+                dto.firstSurname(),
+                dto.secondSurname(),
+                dto.homeCity(),
+                dto.email(),
+                dto.mobileNumber()
         );
 
    
