@@ -25,8 +25,8 @@ public class RegisterUserInteractorImpl implements RegisterUserInteractor {
 
 
         RegisterUserDomain registerUserDomain = new RegisterUserDomain(
-                dto.idNumber(),
                 dto.idType(),
+                dto.idNumber(),
                 dto.firstName(),
                 dto.secondName(),
                 dto.firstSurname(),

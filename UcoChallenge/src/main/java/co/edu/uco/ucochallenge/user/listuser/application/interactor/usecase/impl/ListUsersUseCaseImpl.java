@@ -35,6 +35,7 @@ public class ListUsersUseCaseImpl implements ListUsersUseCase {
 
         // Mapear entidades a DTOs
         return userEntities.map(user -> new UserOutputDTO(
+                user.getId(),
                 user.getIdType().getId(),
                 user.getIdNumber(),
                 user.getFirstName(),

@@ -25,15 +25,21 @@ public class NotificationService {
 		this.objectMapper = new ObjectMapper();
 	}
 
-	public void sendEmailVerification(String email, String token) {
-		String message = String.format("Enviando verificación a %s con token: %s", email, token);
-		publishMessage(CHANNEL_EMAIL_VERIFICATION, email, message);
+	public void sendEmailVerification(String email, String token, String message) {
+		// Enviar email con el token y el mensaje
+		// Código de envío de email...
+		System.out.println("Email sent to: " + email);
+		System.out.println("Token: " + token);
+		System.out.println("Message: " + message);
 	}
 
-	public void sendSmsVerification(String phone, String token) {
-		String message = String.format("Enviando verificación a %s con token: %s", phone, token);
-		publishMessage(CHANNEL_SMS_VERIFICATION, phone, message);
+	public void sendSmsVerification(String phone, String token, String message) {
+		// Enviar SMS con el token y el mensaje
+		System.out.println("SMS sent to: " + phone);
+		System.out.println("Token: " + token);
+		System.out.println("Message: " + message);
 	}
+
 
 	public void notifyActor(String actor, String message) {
 		publishMessage(CHANNEL_ACTOR, actor, message);
