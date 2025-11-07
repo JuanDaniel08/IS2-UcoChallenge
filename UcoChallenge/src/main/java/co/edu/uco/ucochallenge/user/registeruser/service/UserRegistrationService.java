@@ -1,4 +1,4 @@
-package co.edu.uco.ucochallenge.user.registeruser.application.service;
+package co.edu.uco.ucochallenge.user.registeruser.service;
 
 import co.edu.uco.ucochallenge.secondary.ports.repository.UserRepository;
 import co.edu.uco.ucochallenge.secondary.adapters.repository.entity.UserEntity;

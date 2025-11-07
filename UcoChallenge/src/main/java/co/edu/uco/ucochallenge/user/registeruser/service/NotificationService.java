@@ -1,11 +1,12 @@
-package co.edu.uco.ucochallenge.user.registeruser.application.service;
+package co.edu.uco.ucochallenge.user.registeruser.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import co.edu.uco.ucochallenge.user.registeruser.service.dto.NotificationMessage;
+
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-
-import co.edu.uco.ucochallenge.user.registeruser.application.service.dto.NotificationMessage;
 
 @Service
 public class NotificationService {

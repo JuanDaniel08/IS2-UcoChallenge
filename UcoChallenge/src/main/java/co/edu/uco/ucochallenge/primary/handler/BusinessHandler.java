@@ -1,8 +1,9 @@
 package co.edu.uco.ucochallenge.primary.handler;
 
-import co.edu.uco.ucochallenge.user.registeruser.application.service.UserRegistrationService.BusinessRuleException;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+
+import co.edu.uco.ucochallenge.user.registeruser.service.UserRegistrationService.BusinessRuleException;
 
 import java.util.Map;
 

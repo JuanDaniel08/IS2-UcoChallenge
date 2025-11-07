@@ -1,11 +1,12 @@
-package co.edu.uco.ucochallenge.user.registeruser.application.service.listener;
+package co.edu.uco.ucochallenge.user.registeruser.service.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import co.edu.uco.ucochallenge.user.registeruser.service.dto.NotificationMessage;
+
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
-
-import co.edu.uco.ucochallenge.user.registeruser.application.service.dto.NotificationMessage;
 
 /**
  * Listener opcional para consumir mensajes de notificación desde Redis

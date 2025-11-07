@@ -1,4 +1,4 @@
-package co.edu.uco.ucochallenge.user.registeruser.application.service.dto;
+package co.edu.uco.ucochallenge.user.registeruser.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;

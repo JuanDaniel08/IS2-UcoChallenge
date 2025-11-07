@@ -1,6 +1,9 @@
 package co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.impl;
 
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.validator.ValidationResultVO;
+import co.edu.uco.ucochallenge.user.registeruser.service.NotificationService;
+import co.edu.uco.ucochallenge.user.registeruser.service.VerificationTokenService;
+
 import org.springframework.stereotype.Service;
 import co.edu.uco.ucochallenge.application.Void;
 import co.edu.uco.ucochallenge.secondary.adapters.repository.entity.CityEntity;
@@ -11,8 +14,7 @@ import co.edu.uco.ucochallenge.secondary.ports.repository.UserRepository;
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.CatalogUseCase;
 import co.edu.uco.ucochallenge.user.registeruser.application.interactor.usecase.RegisterUserUseCase;
 import co.edu.uco.ucochallenge.user.registeruser.application.usecase.domain.RegisterUserDomain;
-import co.edu.uco.ucochallenge.user.registeruser.application.service.NotificationService;
-import co.edu.uco.ucochallenge.user.registeruser.application.service.VerificationTokenService;
+
 import java.time.Duration;
 import java.util.UUID;
 

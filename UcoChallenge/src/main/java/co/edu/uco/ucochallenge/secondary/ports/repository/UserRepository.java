@@ -12,6 +12,7 @@ import co.edu.uco.ucochallenge.secondary.adapters.repository.entity.UserEntity;
 @Repository
 
 public interface UserRepository extends JpaRepository<UserEntity, UUID> {
+    
     Optional<UserEntity> findByEmail(String email);
     Optional<UserEntity> findByMobileNumber(String mobileNumber);
     Optional<UserEntity> findByIdTypeAndIdNumber(IdTypeEntity idType, String idNumber);
