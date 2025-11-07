@@ -5,86 +5,89 @@ import java.util.UUID;
 import co.edu.uco.ucochallenge.crosscuting.helper.ObjectHelper;
 import co.edu.uco.ucochallenge.crosscuting.helper.TextHelper;
 import co.edu.uco.ucochallenge.crosscuting.helper.UUIDHelper;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "Ciudad")
 public class CityEntity {
 
-	@Id
-	@Column(name = "id")
-	private UUID id;
+    @Id
+    @Column(name = "id", columnDefinition = "CHAR(36)")
+    private UUID id;
 
-	@ManyToOne
-	@JoinColumn(name = "departamento", nullable = false)
-	private StateEntity state;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "departamento", nullable = false)
+    private StateEntity state;
 
-	@Column(name = "nombre")
-	private String name;
+    @Column(name = "nombre")
+    private String name;
 
-	protected CityEntity() {
-		setId(UUIDHelper.getDefault());
-		setState(new StateEntity());
-		setName(TextHelper.getDefault());
-	}
+    /**
+     * ✅ Constructor vacío obligatorio para JPA/Hibernate.
+     * ❗️Debe permanecer vacío (sin lógica ni helpers).
+     */
+    protected CityEntity() {
+        // No inicializar nada aquí
+    }
 
-	private CityEntity(final Builder builder) {
-		setId(builder.id);
-		setState(builder.state);
-		setName(builder.name);
-	}
+    /**
+     * Constructor privado para el patrón Builder.
+     */
+    private CityEntity(final Builder builder) {
+        setId(builder.id);
+        setState(builder.state);
+        setName(builder.name);
+    }
 
-	public static class Builder {
-		private UUID id;
-		private StateEntity state;
-		private String name;
+    // --- Builder Pattern ---
+    public static class Builder {
+        private UUID id;
+        private StateEntity state;
+        private String name;
 
-		public Builder id(final UUID id) {
-			this.id = id;
-			return this;
-		}
+        public Builder id(final UUID id) {
+            this.id = id;
+            return this;
+        }
 
-		public Builder state(final StateEntity state) {
-			this.state = state;
-			return this;
-		}
+        public Builder state(final StateEntity state) {
+            this.state = state;
+            return this;
+        }
 
-		public Builder name(final String name) {
-			this.name = name;
-			return this;
-		}
+        public Builder name(final String name) {
+            this.name = name;
+            return this;
+        }
 
-		public CityEntity build() {
-			return new CityEntity(this);
-		}
-	}
+        public CityEntity build() {
+            return new CityEntity(this);
+        }
+    }
 
-	public UUID getId() {
-		return id;
-	}
+    // --- Getters ---
+    public UUID getId() {
+        return id;
+    }
 
-	public StateEntity getState() {
-		return state;
-	}
+    public StateEntity getState() {
+        return state;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	private void setId(final UUID id) {
-		this.id = UUIDHelper.getDefault(id);
-	}
+    // --- Setters ---
+    private void setId(final UUID id) {
+        this.id = UUIDHelper.getDefault(id);
+    }
 
-	private void setState(final StateEntity state) {
-		this.state = ObjectHelper.getDefault(state, new StateEntity());
-	}
+    private void setState(final StateEntity state) {
+        this.state = ObjectHelper.getDefault(state, null);
+    }
 
-	private void setName(final String name) {
-		this.name = TextHelper.getDefaultWithTrim(name);
-	}
+    private void setName(final String name) {
+        this.name = TextHelper.getDefaultWithTrim(name);
+    }
 }

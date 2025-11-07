@@ -11,11 +11,13 @@ import jakarta.persistence.*;
 @Table(name = "Usuario")
 public class UserEntity {
 
+    // ======== ATRIBUTOS ========
+
     @Id
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "CHAR(36)")
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tipoIdentificacion")
     private IdTypeEntity idType;
 
@@ -34,7 +36,7 @@ public class UserEntity {
     @Column(name = "segundoApellido")
     private String secondSurname;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ciudadResidencia")
     private CityEntity homeCity;
 
@@ -50,27 +52,26 @@ public class UserEntity {
     @Column(name = "telefonoMovilConfirmado")
     private boolean mobileNumberConfirmed;
 
+    // 👇 Estos campos no se guardan en BD
+    @Transient
     private boolean emailConfirmedIsDefaultValue;
+
+    @Transient
     private boolean mobileNumberConfirmedIsDefaultValue;
 
+    // ======== CONSTRUCTORES ========
+
+    /**
+     * Constructor vacío requerido por JPA/Hibernate.
+     * ❗️No debe contener lógica ni inicializaciones.
+     */
     protected UserEntity() {
-        setId(UUIDHelper.getDefault());
-        setIdType(new IdTypeEntity());
-        setIdNumber(TextHelper.getDefault());
-        setFirstName(TextHelper.getDefault());
-        setSecondName(TextHelper.getDefault());
-        setFirstSurname(TextHelper.getDefault());
-        setSecondSurname(TextHelper.getDefault());
-        setHomeCity(new CityEntity());
-        setEmail(TextHelper.getDefault());
-        setMobileNumber(TextHelper.getDefault());
-        setEmailConfirmed(false);
-        setMobileNumberConfirmed(false);
-        setEmailConfirmedIsDefaultValue(true);
-        setMobileNumberConfirmedIsDefaultValue(true);
+        // Hibernate lo usa mediante reflexión.
     }
 
-    // --- Constructor Builder ---
+    /**
+     * Constructor privado para el patrón Builder.
+     */
     private UserEntity(final Builder builder) {
         setId(builder.id);
         setIdType(builder.idType);
@@ -88,7 +89,8 @@ public class UserEntity {
         setMobileNumberConfirmedIsDefaultValue(builder.mobileNumberConfirmedIsDefaultValue);
     }
 
-    // --- Builder ---
+    // ======== BUILDER ========
+
     public static final class Builder {
         private UUID id;
         private IdTypeEntity idType;
@@ -128,7 +130,8 @@ public class UserEntity {
         public UserEntity build() { return new UserEntity(this); }
     }
 
-    // --- Getters ---
+    // ======== GETTERS ========
+
     public UUID getId() { return id; }
     public IdTypeEntity getIdType() { return idType; }
     public String getIdNumber() { return idNumber; }
@@ -142,11 +145,14 @@ public class UserEntity {
     public boolean isEmailConfirmed() { return emailConfirmed; }
     public boolean isMobileNumberConfirmed() { return mobileNumberConfirmed; }
 
-    // --- Setters (solo cambió este a PUBLIC) ---
-    public void setId(final UUID id) { this.id = UUIDHelper.getDefault(id); }
+    // ======== SETTERS ========
+
+    public void setId(final UUID id) {
+        this.id = UUIDHelper.getDefault(id);
+    }
 
     private void setIdType(final IdTypeEntity idType) {
-        this.idType = ObjectHelper.getDefault(idType, new IdTypeEntity());
+        this.idType = ObjectHelper.getDefault(idType, null);
     }
 
     private void setIdNumber(final String idNumber) {
@@ -170,7 +176,7 @@ public class UserEntity {
     }
 
     private void setHomeCity(final CityEntity homeCity) {
-        this.homeCity = ObjectHelper.getDefault(homeCity, new CityEntity());
+        this.homeCity = ObjectHelper.getDefault(homeCity, null);
     }
 
     private void setEmail(final String email) {
