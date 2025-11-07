@@ -5,8 +5,11 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-	<parent> 
-	<groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-parent</artifactId> <version>3.5.6</version> <relativePath/> <!-- lookup parent from repository -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.6</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>co.edu.uco.ucochallenge</groupId>
@@ -17,9 +20,12 @@
 
     <properties>
         <java.version>21</java.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <lombok.version>1.18.34</lombok.version>
     </properties>
 
     <dependencies>
+
         <!-- SPRING WEB -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -49,10 +55,26 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
 
-        <!-- DEVTOOLS (opcional) -->
+        <!-- MAPSTRUCT (para mapeo DTO ↔ Entidad) -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+
+        <!-- PROCESADOR DE ANOTACIONES MAPSTRUCT -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- DEVTOOLS (opcional, para recarga automática) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -65,13 +87,14 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        
-        <!-- Redis -->
+
+        <!-- REDIS (si lo vas a usar más adelante) -->
         <dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-data-redis</artifactId>
-		</dependency> 
-        
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!-- DOCKER COMPOSE SUPPORT -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-docker-compose</artifactId>
@@ -79,41 +102,16 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- ApiGateway -->
+        <!-- EUREKA CLIENT (para registro en el Api Gateway) -->
         <dependency>
-		    <groupId>org.springframework.cloud</groupId>
-		    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
             <version>4.2.0</version>
-		</dependency>
+        </dependency>
 
-        <!-- Spring Boot Actuator -->
+        <!-- ACTUATOR (monitoreo del microservicio) -->
         <dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-actuator</artifactId>
-            <version>3.5.6</version>
-		</dependency>
-
-        <!-- Prometheus -->
-        <dependency>
-		    <groupId>io.micrometer</groupId>
-		    <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>1.16.0</version>
-		</dependency>
-
-        
-
-    </dependencies>
-	
-	
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-
+            <groupId>org.springframework.boot</groupId>
 </project>
 
 
