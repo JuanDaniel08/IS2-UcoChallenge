@@ -1,0 +1,10 @@
+[33m00cf598[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdaniel[m[33m)[m se agregó editar y listar más fix
+[33m7748cf5[m nuevo
+[33mc09fa00[m arreglo de redis
+[33m6579ee6[m MessageCatalog
+[33m8a43304[m Departamento
+[33madad8b7[m LogicaNegocio
+[33m23a0aff[m CatalogUseCase
+[33m4b924e2[m nn2
+[33m396e7da[m Se crea Redis en pom y application properies
+[33me6e26aa[m 1 commit
